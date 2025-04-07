@@ -4,12 +4,14 @@ require "http"
 require "json"
 require "dotenv/load"
 
-pp "Where are you located?"
+puts "Will you need an umbrella today?"
 
-user_location = gets.chomp
-# user_location = "Chicago"
+puts "Where are you located?"
 
-pp user_location
+# user_location = gets.chomp
+user_location = "Dothan"
+
+puts "Checking the weather at #{user_location}...."
 
 maps_url = "https://maps.googleapis.com/maps/api/geocode/json?address=" + user_location + "&key=" + ENV.fetch("GMAPS_KEY")
 
@@ -27,12 +29,39 @@ geo = first_result.fetch("geometry")
 
 loc = geo.fetch("location")
 
-pp latitude = loc.fetch("lat")
-pp longitude = loc.fetch("lng")
+latitude = loc.fetch("lat")
+longitude = loc.fetch("lng")
 
-google_maps_api_key = ENV.fetch("GMAPS_KEY")
-pirate_weather_api_key = ENV.fetch("PIRATE_WEATHER_KEY")
+puts "Your coordinates are #{latitude}, #{longitude}."
 
-pirate_weather_url = "https://api.pirateweather.net/forecast/" + pirate_weather_api_key + "/"
+# Take the lat/long
+# Assemble the correct URL for the Pirate Weather API
+# Get it, parse it, and dig out the current temperature
 
-raw_response = HTTP.get(pirate_weather_url)
+pirate_weather_url = "https://api.pirateweather.net/forecast/" + ENV.fetch("PIRATE_WEATHER_KEY") + "/#{latitude},#{longitude}"
+
+resp = HTTP.get(pirate_weather_url)
+
+raw_response = resp.to_s
+
+parsed_response = JSON.parse(raw_response)
+
+current = parsed_response.fetch("currently")
+hourly = parsed_response.fetch("hourly")
+rain = hourly.fetch("data").at(0).fetch("precipProbability") * 100
+# puts rain.to_i.to_s + "%"
+
+temp = current.fetch("temperature")
+
+next_hour = hourly.fetch("summary")
+
+puts "It is currently #{temp}°F."
+puts "Next hour: #{next_hour}"
+
+# puts "In #{} hours, there is a #{} chance of precipitation."
+
+# if next_hour = "Clear"
+#  puts "You probably won't need an umbrella."
+# else
+#  puts "You might want to take an umbrella!"
+# end 
