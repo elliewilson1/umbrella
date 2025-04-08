@@ -52,21 +52,38 @@ parsed_response = JSON.parse(raw_response)
 
 current = parsed_response.fetch("currently")
 hourly = parsed_response.fetch("hourly")
-# hours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-rain = hourly.fetch("data").at(0).fetch("precipProbability") * 100
-# puts rain.to_i.to_s + "%"
+minutely = parsed_response.fetch("minutely")
+hourly_data = hourly.fetch("data")
 
 temp = current.fetch("temperature")
-
-next_hour = hourly.fetch("summary")
+next_hour_summary = minutely.fetch("summary")
 
 puts "It is currently #{temp}°F."
-puts "Next hour: #{next_hour}"
+puts "Next hour: #{next_hour_summary}"
 
-# puts "In #{} hours, there is a #{} chance of precipitation."
+# This flag will help us later decide if we need to suggest an umbrella
+any_precipitation = false
 
-if rain > 0
+# Loop through each hour in the hourly data array
+next_twelve_hours = hourly_data[1..12]
+next_twelve_hours.each do |hour_data|
+  precip_chance = hour_data.fetch("precipProbability") * 100
+  
+  # Only output the message if the chance is above 0%
+  if precip_chance > 10
+    # Convert the epoch time into a Time object
+    forecast_time = Time.at(hour_data.fetch("time"))
+    
+    # Determine the number of hours from now
+    hours_from_now = ((forecast_time - Time.now) / 3600).round
+    puts "In #{hours_from_now} hours, there is a #{precip_chance.to_i}% chance of precipitation."
+    
+    any_precipitation = true
+  end
+end
+
+if any_precipitation
   puts "You might want to take an umbrella!"
 else
   puts "You probably won't need an umbrella."
-end 
+end
