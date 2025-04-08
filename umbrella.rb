@@ -12,8 +12,8 @@ puts
 
 puts "Where are you located?"
 
-# user_location = gets.chomp
-user_location = "Miami"
+user_location = gets.chomp
+# user_location = "Miami"
 
 puts "Checking the weather at #{user_location}...."
 
@@ -68,9 +68,10 @@ any_precipitation = false
 next_twelve_hours = hourly_data[1..12]
 next_twelve_hours.each do |hour_data|
   precip_chance = hour_data.fetch("precipProbability") * 100
-  
-  # Only output the message if the chance is above 0%
-  if precip_chance > 10
+
+  if precip_chance <= 10
+    break
+  elsif precip_chance > 10
     # Convert the epoch time into a Time object
     forecast_time = Time.at(hour_data.fetch("time"))
     
