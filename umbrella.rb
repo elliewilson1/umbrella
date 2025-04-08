@@ -4,12 +4,16 @@ require "http"
 require "json"
 require "dotenv/load"
 
-puts "Will you need an umbrella today?"
+line_width = 40
+puts "=" * line_width
+puts "Will you need an umbrella today?".center(line_width)
+puts "=" * line_width
+puts
 
 puts "Where are you located?"
 
 # user_location = gets.chomp
-user_location = "Dothan"
+user_location = "Miami"
 
 puts "Checking the weather at #{user_location}...."
 
@@ -48,6 +52,7 @@ parsed_response = JSON.parse(raw_response)
 
 current = parsed_response.fetch("currently")
 hourly = parsed_response.fetch("hourly")
+# hours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 rain = hourly.fetch("data").at(0).fetch("precipProbability") * 100
 # puts rain.to_i.to_s + "%"
 
@@ -60,8 +65,8 @@ puts "Next hour: #{next_hour}"
 
 # puts "In #{} hours, there is a #{} chance of precipitation."
 
-# if next_hour = "Clear"
-#  puts "You probably won't need an umbrella."
-# else
-#  puts "You might want to take an umbrella!"
-# end 
+if rain > 0
+  puts "You might want to take an umbrella!"
+else
+  puts "You probably won't need an umbrella."
+end 
